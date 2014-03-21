@@ -50,6 +50,7 @@ Requires:       lib@BASELIB@@SONAME_MAJOR@
 Provides:       lib@BASELIB@-qt = %{version}
 Provides:       yast2-qt = %{version}
 Obsoletes:      yast2-qt < 2.42.0
+Conflicts:      libproxy1-config-kde4
 
 Url:            @URL@
 Summary:        @SUMMARY@
