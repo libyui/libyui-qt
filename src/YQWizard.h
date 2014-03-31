@@ -572,7 +572,7 @@ protected:
 
     QStackedWidget *	_sideBar;
     QWidget     *       _stepsPanel;
-    QPushButton *	_releaseNotesButton;
+    QLabel 	*	_releaseNotesLink;
     std::string		 _releaseNotesButtonId;
     QPushButton *	_helpButton;
     QPushButton *		_stepsButton;

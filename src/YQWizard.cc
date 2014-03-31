@@ -121,7 +121,7 @@ YQWizard::YQWizard( YWidget *		parent,
     _helpButton		= 0;
     _stepsButton	= 0;
     _treeButton		= 0;
-    _releaseNotesButton = 0;
+    _releaseNotesLink   = 0;
     _treePanel		= 0;
     _tree		= 0;
     _workArea		= 0;
@@ -413,7 +413,7 @@ void YQWizard::updateSteps()
 
     _stepsVBox->addStretch( 99 );
     QVBoxLayout *rbl = new QVBoxLayout();
-    rbl->addWidget( _releaseNotesButton, 0, Qt::AlignCenter );
+    rbl->addWidget( _releaseNotesLink, 0, Qt::AlignCenter );
 
     _stepsVBox->addLayout( rbl );
     _stepsVBox->addStretch( 29 );
@@ -733,15 +733,18 @@ QWidget *YQWizard::layoutWorkArea( QWidget * parent )
     _dialogHeading->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum ) ); // hor/vert
     _dialogHeading->setObjectName( "DialogHeading" );
 
-    _releaseNotesButton = new QPushButton( _( "Release Notes..." ), _workArea );
+    _releaseNotesLink = new QLabel( _( "<a href=\"relnotes\">Release Notes...</a>" ), _workArea );
+    _releaseNotesLink->setTextFormat(Qt::RichText);
+    _releaseNotesLink->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+    _releaseNotesLink->setOpenExternalLinks(false);
     YUI_CHECK_NEW( _workArea );
-    headingHBox->addWidget( _releaseNotesButton );
-    _releaseNotesButton->setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum ) ); // hor/vert
+    headingHBox->addWidget( _releaseNotesLink );
+    _releaseNotesLink->setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum ) ); // hor/vert
 
-    connect( _releaseNotesButton,      &pclass(_releaseNotesButton)::clicked,
-            this,                      &pclass(this)::showReleaseNotes );
+    connect( _releaseNotesLink, &QLabel::linkActivated,
+             this,              &YQWizard::showReleaseNotes );
 
-    _releaseNotesButton->hide();       // hidden until showReleaseNotesButton() is called
+    _releaseNotesLink->hide();       // hidden until showReleaseNotesButton() is called
 
     //
     // Client area (the part that belongs to the YCP application)
@@ -1218,7 +1221,7 @@ void YQWizard::setButtonLabel( YPushButton * button, const std::string & newLabe
 
 void YQWizard::showReleaseNotesButton( const std::string & label, const std::string & id )
 {
-    if ( ! _releaseNotesButton )
+    if ( ! _releaseNotesLink )
     {
 	yuiError() << "NULL Release Notes button" << std::endl;
 
@@ -1229,17 +1232,17 @@ void YQWizard::showReleaseNotesButton( const std::string & label, const std::str
     }
 
     // no way to check the shortcut, so strip it
-    _releaseNotesButton->setText( fromUTF8( YShortcut::cleanShortcutString( label ) ) );
+    _releaseNotesLink->setText( "<a href=\"relnotes\">" + fromUTF8( YShortcut::cleanShortcutString( label ) ) + "</a>" );
     _releaseNotesButtonId = id;
 
-    _releaseNotesButton->show();
+    _releaseNotesLink->show();
 }
 
 
 void YQWizard::hideReleaseNotesButton()
 {
-    if ( _releaseNotesButton && !_releaseNotesButton->isHidden() )
-	_releaseNotesButton->hide();
+    if ( _releaseNotesLink && !_releaseNotesLink->isHidden() )
+        _releaseNotesLink->hide();
 }
 
 
