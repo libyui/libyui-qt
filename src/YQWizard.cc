@@ -128,6 +128,7 @@ YQWizard::YQWizard( YWidget *		parent,
     _clientArea		= 0;
     _menuBar		= 0;
     _dialogIcon		= 0;
+    _dialogLogo		= 0;
     _dialogHeading	= 0;
     _contents		= 0;
     _backButton		= 0;
@@ -713,10 +714,42 @@ QWidget *YQWizard::layoutWorkArea( QWidget * parent )
     // Dialog icon and heading
     //
 
+    string logo_filename = "/logo.png"; // FIXME
+
+    bool use_logo = logo_filename != "";
+    QPixmap dialog_logo = 0;
+    if (use_logo)
+    {
+        dialog_logo = QPixmap( logo_filename.c_str() );
+
+        if ( dialog_logo.isNull() )
+        {
+            yuiWarning() << "Couldn't load logo \"" << logo_filename << "\"" << std::endl;
+            use_logo = false;
+        }
+    }
+
+    QVBoxLayout * headingVBox = NULL;
+    QHBoxLayout * logoHBox = NULL;
+    if (use_logo) {
+        headingVBox = new QVBoxLayout();
+        YUI_CHECK_NEW( headingVBox );
+        innerbox->addLayout( headingVBox );
+        logoHBox = new QHBoxLayout();
+        YUI_CHECK_NEW( logoHBox );
+        headingVBox->addLayout( logoHBox );
+    }
     QHBoxLayout * headingHBox = new QHBoxLayout();
     YUI_CHECK_NEW( headingHBox );
     //headingHBox->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum ) ); // hor/vert
-    innerbox->addLayout( headingHBox );
+    if (use_logo)
+    {
+        headingVBox->addLayout( headingHBox );
+    }
+    else
+    {
+        innerbox->addLayout( headingHBox );
+    }
 
     _dialogIcon = new QLabel( _workArea );
     YUI_CHECK_NEW( _dialogIcon );
@@ -738,7 +771,23 @@ QWidget *YQWizard::layoutWorkArea( QWidget * parent )
     _releaseNotesLink->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
     _releaseNotesLink->setOpenExternalLinks(false);
     YUI_CHECK_NEW( _workArea );
-    headingHBox->addWidget( _releaseNotesLink );
+    if (use_logo)
+    {
+
+        _dialogLogo = new QLabel( _workArea );
+        YUI_CHECK_NEW( _dialogLogo );
+        logoHBox->addWidget( _dialogLogo );
+        _dialogLogo->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ) ); // hor/vert
+        _dialogLogo->setObjectName( "DialogLogo" );
+        _dialogLogo->setPixmap( dialog_logo );
+
+        logoHBox->addStretch();
+        logoHBox->addWidget( _releaseNotesLink );
+    }
+    else
+    {
+        headingHBox->addWidget( _releaseNotesLink );
+    }
     _releaseNotesLink->setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum ) ); // hor/vert
 
     connect( _releaseNotesLink, &QLabel::linkActivated,
