@@ -1,4 +1,5 @@
 sudo: required
+dist: xenial
 language: bash
 services:
   - docker
@@ -8,4 +9,12 @@ before_install:
 script:
   # the "libyui-travis" script is included in the base libyui/devel image
   # see https://github.com/libyui/docker-devel/blob/master/libyui-travis
-  - docker run -it libyui-qt-image libyui-travis
+  - docker run -it libyui-qt-image /usr/lib64/qt5/bin/uic --help
+  - docker run -it libyui-qt-image uname -a
+  - docker run -it libyui-qt-image ldd /usr/lib64/qt5/bin/uic
+  - docker run -it libyui-qt-image env
+  - docker run -it libyui-qt-image cat /etc/ld.so.conf
+  - docker run -it libyui-qt-image ldconfig -v | grep Qt5Core
+  - docker run -it libyui-qt-image ldconfig -v 2>/dev/null | grep -v ^$'\t'
+  - docker run -it libyui-qt-image ldconfig -p
+  - docker run -it libyui-qt-image bash -c "zypper --non-interactive in strace; strace /usr/lib64/qt5/bin/uic --help"

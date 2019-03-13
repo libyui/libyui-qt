@@ -35,6 +35,7 @@ libyui-qt.pc
 
 build*/
 doc/
+package/*.tar.bz2
 
 *~
 *.bak
